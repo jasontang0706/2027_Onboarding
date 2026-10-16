@@ -124,7 +124,16 @@ static HAL_StatusTypeDef transmitFrame(const I2cDacFrame_t *frame)
     // TIP: look up HAL_I2C_Master_Transmit. It sends the address byte itself and
     // wants the 7 bit address shifted left by one. Use I2C_DAC_TIMEOUT_MS.
 
-    return HAL_ERROR;
+    HAL_StatusTypeDef status;
+
+    status = HAL_I2C_Master_Transmit(
+        &hi2c1,
+		(I2C_DAC_ADDRESS7 << 1), 
+		frame->bytes, 
+		6U, 
+		I2C_DAC_TIMEOUT_MS); 
+
+    return status;
 }
 
 static HAL_StatusTypeDef activateDAC(void)
@@ -149,7 +158,7 @@ HAL_StatusTypeDef i2cDacInit(void)
     // CubeMX drives PF10 low at reset, and a low LDAC makes the DAC latch every
     // write at its last acknowledge, which defeats the UDAC bit the frames set.
     // Park it high so the first transfer defers like every later one.
-    
+
     HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_SET);
 
     return HAL_OK;
