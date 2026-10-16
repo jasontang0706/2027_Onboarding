@@ -19,6 +19,7 @@
 #include "debug.h"
 #include "i2c.h"
 #include "i2cBus.h"
+#include "main.h"
 
 #define I2C_DAC_TIMEOUT_MS 15
 
@@ -140,17 +141,20 @@ static HAL_StatusTypeDef activateDAC(void)
 {
     // TODO: To activate the DAC, we need to strobe PF10. First you need to go into
     // CubeMX and check the GPIO for PF10 is enabled as an output.
-    //TIP: look up HAL_GPIO_WritePin, and see T_LDAC_MS above for the hold time.
-    //LDAC is active low, so work out which level does what, and what state the
-    //pin should be left in for the next write.
+    // TIP: look up HAL_GPIO_WritePin, and see T_LDAC_MS above for the hold time.
+    // LDAC is active low, so work out which level does what, and what state the
+    // pin should be left in for the next write.
 
     // assert
+    HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_RESET);
 
     // wait
+    HAL_Delay(T_LDAC_MS);
 
     // release
+    HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_SET);
 
-    return HAL_ERROR;
+    return HAL_OK;
 }
 
 HAL_StatusTypeDef i2cDacInit(void)
